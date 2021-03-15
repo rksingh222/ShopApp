@@ -67,9 +67,30 @@ void showAll(){
    notifyListeners();
 }
 */
- void addProducts(){
+
+
+ void addProduct(Product product){
+   final newProduct = Product(
+     title:product.title,
+     description: product.description,
+     price: product.price,
+     imageUrl: product.imageUrl,
+     id: DateTime.now().toString(),
+   );
+   _items.add(newProduct);
    //_items.add(value);
    notifyListeners();
+ }
+ void updateProduct(String id, Product newProduct){
+   final prodIndex = _items.indexWhere((prod) => prod.id == id);
+   if(prodIndex >= 0){
+     _items[prodIndex] = newProduct;
+     notifyListeners();
+   }
+   else{
+     print('...');
+   }
+
  }
 
 }
