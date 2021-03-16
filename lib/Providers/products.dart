@@ -69,10 +69,10 @@ void showAll(){
 }
 */
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     const url =
         'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
-    http.post(
+    return http.post(
       url,
       body: json.encode({
         'title': product.title,
@@ -81,17 +81,22 @@ void showAll(){
         'imageUrl': product.imageUrl,
         'isFavorite': product.isFavorite,
       }),
-    );
-    final newProduct = Product(
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      id: DateTime.now().toString(),
-    );
-    _items.add(newProduct);
-    //_items.add(value);
-    notifyListeners();
+    ).then((response){
+      print(json.decode(response.body));
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: DateTime.now().toString(),
+      );
+      _items.add(newProduct);
+      //_items.add(value);
+      notifyListeners();
+    });
+
+    //return Future.value();
+
   }
 
   void deleteProduct(String id) {
