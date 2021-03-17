@@ -93,6 +93,9 @@ void showAll(){
       _items.add(newProduct);
       //_items.add(value);
       notifyListeners();
+    }).catchError((onError){
+      print(onError);
+      throw onError;
     });
 
     //return Future.value();
