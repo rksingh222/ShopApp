@@ -72,7 +72,7 @@ void showAll(){
 */
 
   Future<void> addProduct(Product product) async {
-    const url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products';
+    const url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
     try {
       print('addproduct');
       print('respone');
