@@ -87,7 +87,62 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.didChangeDependencies();
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async{
+    final isValid = _form.currentState.validate();
+    if (!isValid) {
+      return;
+    }
+    _form.currentState.save();
+    setState(() {
+      isLoading = true;
+    });
+    print(_editedProduct.title);
+    print(_editedProduct.description);
+    print(_editedProduct.imageUrl);
+    print(_editedProduct.price);
+    if (_editedProduct.id != null) {
+      print('edited product id is not null');
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+      Navigator.of(context).pop();
+    } else {
+      print('edited product id is  null');
+      try {
+        print('Inside try block');
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      }
+      catch(error){
+        print('Inside catch');
+        await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('An Error Occured'),
+              content: Text('Something Went Wrong'),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text('ok'),
+                )
+              ],
+            ));
+      }
+      finally {
+        print('finally called');
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  /*
+   using catchError in saveform
+   
+    void _saveForm() {
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
@@ -130,6 +185,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       });
     }
   }
+
+   */
 
   @override
   Widget build(BuildContext context) {

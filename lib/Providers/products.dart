@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import './product.dart';
 import 'package:http/http.dart' as http;
@@ -69,7 +71,49 @@ void showAll(){
 }
 */
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
+    const url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products';
+    try {
+      print('addproduct');
+      print('respone');
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+      //when we are calling json.decode its throwing an error
+      print(json.decode(response.body));
+
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: DateTime.now().toString(),
+      );
+      _items.add(newProduct);
+      print('successful response');
+      notifyListeners();
+
+    } on HttpException catch (error) {
+      print("unsuccessful response");
+      print(error);
+      throw error;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  /*
+  how to use catcherror code instead of try catch block
+
+    Future<void> addProduct(Product product) {
     const url =
         'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
     return http.post(
@@ -101,6 +145,8 @@ void showAll(){
     //return Future.value();
 
   }
+
+   */
 
   void deleteProduct(String id) {
     _items.removeWhere((product) => product.id == id);
