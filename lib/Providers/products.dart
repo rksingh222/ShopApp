@@ -1,3 +1,4 @@
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -169,13 +170,31 @@ void showAll(){
    */
 
   void deleteProduct(String id) {
+    final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$id.json';
+    final existingProductIndex = _items.indexWhere((element) => element.id == id);
+    var existingProduct = _items[existingProductIndex];
     _items.removeWhere((product) => product.id == id);
+    http.delete(url).then((_) {
+      existingProduct = null;
+    }).catchError((onError){
+      _items.insert(existingProductIndex, existingProduct);
+    });
     notifyListeners();
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future <void> updateProduct(String id, Product newProduct) async{
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    print('UpdateIndex  $prodIndex');
+
+
     if (prodIndex >= 0) {
+      final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$prodIndex.json';
+      http.patch(url,body: json.encode({
+        'title': newProduct.title,
+        'description': newProduct.description,
+        'price': newProduct.price,
+        'imageUrl': newProduct.imageUrl,
+      }),);
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {

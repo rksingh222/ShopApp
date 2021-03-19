@@ -102,9 +102,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     print(_editedProduct.price);
     if (_editedProduct.id != null) {
       print('edited product id is not null');
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
-      Navigator.of(context).pop();
+
     } else {
       print('edited product id is  null');
       try {
@@ -131,12 +131,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
       }
       finally {
         print('finally called');
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.of(context).pop();
+        // setState(() {
+        //   isLoading = false;
+        // });
+        // Navigator.of(context).pop();
       }
     }
+    setState(() {
+      isLoading = false;
+    });
+    Navigator.of(context).pop();
+
   }
 
   /*
