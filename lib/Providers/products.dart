@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import './product.dart';
+import '../model/http_exception.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 
 class Products with ChangeNotifier {
   List<Product> _items = [
@@ -169,18 +171,42 @@ void showAll(){
 
    */
 
+  Future<void> deleteProduct(String id) async{
+
+    final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$id.json';
+    final existingProductIndex = _items.indexWhere((element) => element.id == id);
+    var existingProduct = _items[existingProductIndex];
+    _items.removeAt(existingProductIndex);
+    notifyListeners();
+    var response = await http.delete(url);
+    if(response.statusCode >= 400){
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException("Could not delete Product");
+    }
+    existingProduct = null;
+
+  }
+
+
+
+//Using CatchError for delete
+
+/*
   void deleteProduct(String id) {
     final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$id.json';
     final existingProductIndex = _items.indexWhere((element) => element.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeWhere((product) => product.id == id);
-    http.delete(url).then((_) {
+    http.delete(url).then((response) {
       existingProduct = null;
+      print(response.statusCode);
+      //if(response.statusCode == )
     }).catchError((onError){
       _items.insert(existingProductIndex, existingProduct);
     });
     notifyListeners();
-  }
+  }*/
 
   Future <void> updateProduct(String id, Product newProduct) async{
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
