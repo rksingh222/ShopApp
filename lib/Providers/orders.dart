@@ -1,5 +1,8 @@
 import './cart.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class OrderItem {
   final String id;
@@ -21,14 +24,32 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
-  void addOrder(List<CartItem> products, double price) {
+  Future<void> addOrder(List<CartItem> products, double price) async {
+    final url =
+        'https://checkflutterapi-default-rtdb.firebaseio.com/orders.json';
+
+    final timeStamp = DateTime.now();
+
+    final response = await http.post(url,
+        body: json.encode({
+          'amount': price,
+          'dateTime': timeStamp.toIso8601String(),
+          'products': products
+              .map((product) => {
+                    'id': product.id,
+                    'title': product.title,
+                    'quantity': product.quantity,
+                    'price': product.price,
+                  })
+              .toList(),
+        }));
     _orders.insert(
       0,
       OrderItem(
-        id: DateTime.now().toString(),
+        id: json.decode(response.body)['name'],
         amount: price,
         products: products,
-        dateTime: DateTime.now(),
+        dateTime: timeStamp,
       ),
     );
     notifyListeners();

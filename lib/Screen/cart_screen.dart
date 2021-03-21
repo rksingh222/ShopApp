@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../Providers/cart.dart';
 import '../Widget/cart_item.dart' as si;
 import '../Providers/orders.dart';
+
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
 
@@ -26,22 +27,12 @@ class CartScreen extends StatelessWidget {
                     fontSize: 20,
                   ),
                 ),
-
                 Spacer(),
                 Chip(
                   label: Text('\$ ${cart.totalAmount}'),
                   backgroundColor: Colors.blue,
                 ),
-                FlatButton(
-                  onPressed: () {
-                    Provider.of<Orders>(context, listen: false,).addOrder(cart.items.values.toList(), cart.totalAmount);
-                    cart.clear();
-                  },
-                  child: Text(
-                    'Order Now',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
+                OrderButton(cart: cart),
               ],
             ),
           ),
@@ -62,6 +53,50 @@ class CartScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return FlatButton(
+      onPressed: widget.cart.totalAmount <= 0
+          ? null
+          : () async{
+        setState(() {
+          _isLoading = true;
+        });
+             await Provider.of<Orders>(
+                context,
+                listen: false,
+              ).addOrder(
+                  widget.cart.items.values.toList(), widget.cart.totalAmount);
+
+             setState(() {
+               _isLoading = false;
+             });
+              widget.cart.clear();
+            },
+      child: _isLoading == true? CircularProgressIndicator():Text(
+        'Order Now',
+        style: TextStyle(color: Colors.blue),
       ),
     );
   }
