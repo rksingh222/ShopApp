@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,6 @@ import './product.dart';
 import '../model/http_exception.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 
 class Products with ChangeNotifier {
   List<Product> _items = [
@@ -75,14 +73,20 @@ void showAll(){
 */
 
   Future<void> fetchandsetproducts() async {
-    const url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
+    const url =
+        'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
     try {
       final response = await http.get(url);
       print(json.decode(response.body));
+
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProduct = [];
+      if (extractedData == null) {
+        return;
+      }
       extractedData.forEach((prodId, prodData) {
-        loadedProduct.add(Product(id: prodId,
+        loadedProduct.add(Product(
+            id: prodId,
             title: prodData['title'],
             description: prodData['description'],
             price: prodData['price'],
@@ -96,7 +100,8 @@ void showAll(){
   }
 
   Future<void> addProduct(Product product) async {
-    const url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
+    const url =
+        'https://checkflutterapi-default-rtdb.firebaseio.com/products.json';
     try {
       print('addproduct');
       print('respone');
@@ -131,7 +136,6 @@ void showAll(){
       throw error;
     }
   }
-
 
   /*
   how to use catcherror code instead of try catch block
@@ -171,24 +175,22 @@ void showAll(){
 
    */
 
-  Future<void> deleteProduct(String id) async{
-
-    final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$id.json';
-    final existingProductIndex = _items.indexWhere((element) => element.id == id);
+  Future<void> deleteProduct(String id) async {
+    final url =
+        'https://checkflutterapi-default-rtdb.firebaseio.com/products/$id.json';
+    final existingProductIndex =
+        _items.indexWhere((element) => element.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
     notifyListeners();
     var response = await http.delete(url);
-    if(response.statusCode >= 400){
+    if (response.statusCode >= 400) {
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
       throw HttpException("Could not delete Product");
     }
     existingProduct = null;
-
   }
-
-
 
 //Using CatchError for delete
 
@@ -208,19 +210,22 @@ void showAll(){
     notifyListeners();
   }*/
 
-  Future <void> updateProduct(String id, Product newProduct) async{
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     print('UpdateIndex  $prodIndex');
 
-
     if (prodIndex >= 0) {
-      final url = 'https://checkflutterapi-default-rtdb.firebaseio.com/products/$prodIndex.json';
-      http.patch(url,body: json.encode({
-        'title': newProduct.title,
-        'description': newProduct.description,
-        'price': newProduct.price,
-        'imageUrl': newProduct.imageUrl,
-      }),);
+      final url =
+          'https://checkflutterapi-default-rtdb.firebaseio.com/products/$prodIndex.json';
+      http.patch(
+        url,
+        body: json.encode({
+          'title': newProduct.title,
+          'description': newProduct.description,
+          'price': newProduct.price,
+          'imageUrl': newProduct.imageUrl,
+        }),
+      );
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {

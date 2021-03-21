@@ -1,3 +1,4 @@
+
 import './cart.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -22,6 +23,42 @@ class Orders with ChangeNotifier {
 
   List<OrderItem> get orders {
     return [..._orders];
+  }
+
+  Future<void> fetchAndSetOrders() async {
+    final url =
+        'https://checkflutterapi-default-rtdb.firebaseio.com/orders.json';
+    final response = await http.get(url);
+    print(json.decode(response.body));
+
+    final List<OrderItem> loadedOrder = [];
+
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+
+    if(extractedData == null){
+      return ;
+    }
+    extractedData.forEach((orderId, orderData) {
+      loadedOrder.add(
+        OrderItem(
+          id: orderId,
+          amount: orderData['amount'],
+          products: (orderData['products'] as List<dynamic>)
+              .map(
+                (item) => CartItem(
+                    id: item['id'],
+                    title: item['title'],
+                    quantity: item['quantity'],
+                    price: item['price']),
+              )
+              .toList(),
+          dateTime: DateTime.parse(orderData['dateTime']),
+        ),
+      );
+    });
+
+    _orders = loadedOrder.reversed.toList();
+    notifyListeners();
   }
 
   Future<void> addOrder(List<CartItem> products, double price) async {
