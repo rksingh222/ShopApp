@@ -10,6 +10,8 @@ import './Screen/edit_product_screen.dart';
 import './Providers/products.dart';
 import './Providers/cart.dart';
 import './Providers/orders.dart';
+import './Screen/auth_screen.dart';
+import './Providers/auth.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           builder: (ctx) => Orders(),
         ),
+        ChangeNotifierProvider(builder: (ctx) => Auth(),),
       ],
       child: MaterialApp(
         title: 'My Shop',
@@ -49,7 +52,7 @@ class MyApp extends StatelessWidget {
           // closer together (more dense) than on mobile platforms.
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: ProductsOverviewScreen(),
+        home: AuthScreen(),
         routes: {
           ProductsDetailScreen.routeName: (ctx) => ProductsDetailScreen(),
           CartScreen.routeName: (ctx) => CartScreen(),
